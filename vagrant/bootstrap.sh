@@ -98,6 +98,10 @@ function configure_operator {
 
     pip install ~vagrant/kolla
 
+    # Quick&dirty hack to push images to the local registry's lokolla
+    # namespace.
+    sed -i -r "s,kollaglue,${REGISTRY}/lokolla/," /usr/bin/kolla-ansible
+
     # Note: this trickery requires a patched docker binary.
     if [ "$http_proxy" = "" ]; then
         su - vagrant sh -c "echo BUILDFLAGS=\\\"--build-env=http_proxy=$http_proxy --build-env=https_proxy=$https_proxy\\\" > ~/kolla/.buildconf"
@@ -126,18 +130,8 @@ export OS_PASSWORD=password
 export OS_TENANT_NAME=admin
 export OS_VOLUME_API_VERSION=2
 EOF
+    chown vagrant: ~vagrant/openrc
 
-    # Quick&dirty helper script to push images to the local registry's lokolla
-    # namespace.
-    cat > ~vagrant/tag-and-push.sh <<EOF
-for image in \$(docker images|awk '/^kollaglue/ {print \$1}'); do
-    docker tag \$image ${REGISTRY}/lokolla/\${image#kollaglue/}:latest
-    docker push ${REGISTRY}/lokolla/\${image#kollaglue/}:latest
-done
-EOF
-    chmod +x ~vagrant/tag-and-push.sh
-
-    chown vagrant: ~vagrant/openrc ~vagrant/tag-and-push.sh
 
     # Launch a local registry (and mirror) to speed up pulling images.
     # 0.9.1 is actually the _latest_ tag.
