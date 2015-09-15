@@ -13,10 +13,10 @@ PROVIDER="libvirt"
 MULTINODE=false
 
 # The following is only used when deploying in Multi-nodes
-NUMBER_OF_COMPUTE_NODES=3
+NUMBER_OF_CONTROL_NODES=3
+NUMBER_OF_COMPUTE_NODES=1
 NUMBER_OF_STORAGE_NODES=1
 NUMBER_OF_NETWORK_NODES=1
-NUMBER_OF_CONTROL_NODES=1
 
 # Private IP address network
 # Sadly, DHCP assignment on private network is buggy with libvirt provider
